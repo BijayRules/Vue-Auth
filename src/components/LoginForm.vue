@@ -1,4 +1,26 @@
-<script setup></script>
+<script setup>
+import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+
+const email = ref('')
+const password = ref('')
+const authStore = useAuthStore()
+const router = useRouter()
+
+const handleLogin = async () => {
+  const success = await authStore.login(email.value, password.value)
+  if (success) {
+    console.log('Login successful, redirecting to dashboard')
+    router.push({
+      name: 'Dashboard',
+      state: { message: 'Welcome! You have successfully logged in.' }
+    })
+  } else {
+    alert('Login failed')
+  }
+}
+</script>
 
 <template>
   <div className="th-container">
@@ -10,32 +32,18 @@
               <span className="uppercase block mb-2"> GWT Backend </span>
             </h1>
 
-            <form className="mt-10">
+            <form className="mt-10" @submit.prevent="handleLogin">
               <div className="th-form-wrapper">
                 <div className="th-form">
                   <label htmlFor="email">Email</label>
-                  <input
-                    type="text"
-                    name="Email"
-                    value=""
-                    autoComplete="off"
-                    id="email"
-                    placeholder="Email"
-                    required
-                  />
+                  <input type="text" name="Email" value="" id="email" placeholder="Email" v-model="email" />
                 </div>
 
                 <div className="th-form">
                   <label htmlFor="password">Password</label>
                   <div className="relative">
-                    <input
-                      type="{passwordType}"
-                      name="Password"
-                      value=""
-                      id="password"
-                      placeholder="Password"
-                      required
-                    />
+                    <input type="password" name="Password" value="" id="password" placeholder="Password"
+                      v-model="password" />
                   </div>
                 </div>
               </div>
@@ -43,6 +51,8 @@
               <button type="submit" className="th-btn w-full mt-5 disabled:opacity-60">
                 Login
               </button>
+
+              <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
             </form>
           </div>
         </div>
