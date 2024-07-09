@@ -25,7 +25,8 @@ const logout = () => {
 <template>
   <div>
     <h1>Dashboard</h1>
-    <p v-if="message">{{ message }}</p>
+    <h2><strong>Hello,</strong> {{ authStore.user.name }}</h2>
+    <h2>{{ authStore.user.email }}</h2>
     <button @click="logout">Logout</button>
   </div>
 </template>

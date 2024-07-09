@@ -15,7 +15,7 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('../components/LoginForm.vue'),
-      meta: { requiresAuth: false }
+      meta: { requiresGuest: true }
     },
     {
       path: '/register',
@@ -30,29 +30,19 @@ const router = createRouter({
     },
     {
       path: '/',
-      redirect: '/home'
+      redirect: '/dashbaord'
     }
   ]
 })
 
-// router.beforeEach((to, from, next) => {
-//   const authStore = useAuthStore()
-//   console.log('Navigation guard: isAuthenticated =', authStore.isAuthenticated)
-
-//   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-//     console.log('Redirecting to login...')
-//     next('/login')
-//   } else if (to.path === '/login' && authStore.isAuthenticated) {
-//     console.log('Already authenticated, redirecting to dashboard...')
-//     next('/dashboard')
-//   } else {
-//     next()
-//   }
-// })
-
 router.beforeEach((to) => {
-  if (to.meta.requiresAuth && !localStorage.getItem('token')) {
-    return { name: 'dashbaord' }
+  const token = localStorage.getItem('token')
+  if (to.meta.requiresAuth && !token) {
+    return { name: 'login' }
+  }
+
+  if (to.meta.requiresGuest && token) {
+    return { name: 'Dashboard' }
   }
 })
 

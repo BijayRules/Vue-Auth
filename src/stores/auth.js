@@ -17,36 +17,56 @@ export const useAuthStore = defineStore('auth', {
           email,
           password
         })
-        this.setUser(response.data.user, response.data.token)
-        return true
+        if (response.data.success) {
+          this.setUser(response.data.response)
+          return true
+        } else {
+          throw new Error(response.data.message)
+        }
       } catch (error) {
         console.error('Login failed:', error)
         if (error.response && error.response.data) {
-          this.loginError = error.response.data.response.errors.message || 'Login failed'
+          this.loginError = error.response.data.message
         } else {
-          this.loginError = 'An unexpected error occurred'
+          this.loginError = error.message || 'An unexpected error occurred'
         }
         return false
       } finally {
         this.isLoading = false
       }
     },
-    setUser(user, token) {
-      this.user = user
-      this.token = token
-      localStorage.setItem('token', token)
+    setUser(userData) {
+      this.user = {
+        id: userData.id,
+        name: userData.name,
+        email: userData.email
+      }
+      this.token = userData.token
+      localStorage.setItem('token', userData.token)
+      localStorage.setItem('user', JSON.stringify(this.user))
     },
     logout() {
       this.user = null
       this.token = null
       this.loginError = null
       localStorage.removeItem('token')
+      localStorage.removeItem('user')
+    },
+    checkAuth() {
+      const token = localStorage.getItem('token')
+      const user = localStorage.getItem('user')
+      if (token && user) {
+        this.token = token
+        this.user = JSON.parse(user)
+        return true
+      }
+      return false
     },
     clearLoginError() {
       this.loginError = null
     }
   },
   getters: {
-    isAuthenticated: (state) => !!state.token
+    isAuthenticated: () => !!localStorage.getItem('token')
   }
 })
