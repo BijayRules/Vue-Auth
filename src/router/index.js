@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import { useAuthStore } from '@/stores/auth'
+// import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,18 +35,24 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore()
-  console.log('Navigation guard: isAuthenticated =', authStore.isAuthenticated)
+// router.beforeEach((to, from, next) => {
+//   const authStore = useAuthStore()
+//   console.log('Navigation guard: isAuthenticated =', authStore.isAuthenticated)
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    console.log('Redirecting to login...')
-    next('/login')
-  } else if (to.path === '/login' && authStore.isAuthenticated) {
-    console.log('Already authenticated, redirecting to dashboard...')
-    next('/dashboard')
-  } else {
-    next()
+//   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+//     console.log('Redirecting to login...')
+//     next('/login')
+//   } else if (to.path === '/login' && authStore.isAuthenticated) {
+//     console.log('Already authenticated, redirecting to dashboard...')
+//     next('/dashboard')
+//   } else {
+//     next()
+//   }
+// })
+
+router.beforeEach((to) => {
+  if (to.meta.requiresAuth && !localStorage.getItem('token')) {
+    return { name: 'dashbaord' }
   }
 })
 

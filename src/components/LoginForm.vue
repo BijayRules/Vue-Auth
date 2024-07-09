@@ -9,6 +9,7 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 const handleLogin = async () => {
+  authStore.clearLoginError()
   const success = await authStore.login(email.value, password.value)
   if (success) {
     console.log('Login successful, redirecting to dashboard')
@@ -16,8 +17,6 @@ const handleLogin = async () => {
       name: 'Dashboard',
       state: { message: 'Welcome! You have successfully logged in.' }
     })
-  } else {
-    alert('Login failed')
   }
 }
 </script>
@@ -36,23 +35,41 @@ const handleLogin = async () => {
               <div className="th-form-wrapper">
                 <div className="th-form">
                   <label htmlFor="email">Email</label>
-                  <input type="text" name="Email" value="" id="email" placeholder="Email" v-model="email" />
+                  <input
+                    type="text"
+                    name="Email"
+                    value=""
+                    id="email"
+                    placeholder="Email"
+                    v-model="email"
+                  />
                 </div>
 
                 <div className="th-form">
                   <label htmlFor="password">Password</label>
                   <div className="relative">
-                    <input type="password" name="Password" value="" id="password" placeholder="Password"
-                      v-model="password" />
+                    <input
+                      type="password"
+                      name="Password"
+                      value=""
+                      id="password"
+                      placeholder="Password"
+                      v-model="password"
+                    />
                   </div>
                 </div>
               </div>
 
-              <button type="submit" className="th-btn w-full mt-5 disabled:opacity-60">
-                Login
+              <button
+                type="submit"
+                className="th-btn w-full mt-5 disabled:opacity-60"
+                :disabled="authStore.isLoading"
+              >
+                {{ authStore.isLoading ? 'Logging in...' : 'Login' }}
               </button>
 
-              <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+              <!-- <p v-if="authStore.isLoading" class="loading-text">Loading...</p> -->
+              <p v-if="authStore.loginError" class="error-message">{{ authStore.loginError }}</p>
             </form>
           </div>
         </div>
@@ -60,3 +77,15 @@ const handleLogin = async () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.error-message {
+  color: red;
+  background: rgba(255, 0, 0, 0.171);
+  padding: 5px;
+  font-size: 14px;
+  margin-top: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+</style>

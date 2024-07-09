@@ -1,12 +1,3 @@
-<!-- components/Dashboard.vue -->
-<template>
-  <div>
-    <h1>Dashboard</h1>
-    <p v-if="message">{{ message }}</p>
-    <button @click="logout">Logout</button>
-  </div>
-</template>
-
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
@@ -30,3 +21,11 @@ const logout = () => {
   router.push('/login')
 }
 </script>
+
+<template>
+  <div>
+    <h1>Dashboard</h1>
+    <p v-if="message">{{ message }}</p>
+    <button @click="logout">Logout</button>
+  </div>
+</template>

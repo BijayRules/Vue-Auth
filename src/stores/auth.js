@@ -4,10 +4,14 @@ import axios from 'axios'
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
-    token: null
+    token: null,
+    loginError: null,
+    isLoading: false
   }),
   actions: {
     async login(email, password) {
+      this.isLoading = true
+      this.loginError = null
       try {
         const response = await axios.post('https://genesisapi.popmanteau.com/api/v1/login', {
           email,
@@ -17,7 +21,14 @@ export const useAuthStore = defineStore('auth', {
         return true
       } catch (error) {
         console.error('Login failed:', error)
+        if (error.response && error.response.data) {
+          this.loginError = error.response.data.response.errors.message || 'Login failed'
+        } else {
+          this.loginError = 'An unexpected error occurred'
+        }
         return false
+      } finally {
+        this.isLoading = false
       }
     },
     setUser(user, token) {
@@ -28,13 +39,11 @@ export const useAuthStore = defineStore('auth', {
     logout() {
       this.user = null
       this.token = null
+      this.loginError = null
       localStorage.removeItem('token')
     },
-    checkAuth() {
-      const token = localStorage.getItem('token')
-      if (token) {
-        this.token = token
-      }
+    clearLoginError() {
+      this.loginError = null
     }
   },
   getters: {
